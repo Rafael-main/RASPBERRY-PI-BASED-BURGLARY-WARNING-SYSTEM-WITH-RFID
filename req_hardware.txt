@@ -1,0 +1,13 @@
+1.Raspberry Pi board 
+2LCD screen x 1 -- https://bit.ly/2IkIjef
+3.I2C module x 1 -- https://bit.ly/2U2llvg
+4.Relay module x 1 -- https://bit.ly/3qgSAey
+5.Buzzer x 1 -- https://bit.ly/35wpP3Q
+6.GPIO extension board x 1 -- https://bit.ly/3aP5KLw
+7.GPIO ribbon cable x 1 -- https://bit.ly/3zcZrL2
+8.Breadboard x 1 -- https://bit.ly/3f4fI9w
+9.Female to Male jumper wires x 14 -- https://bit.ly/3kMWzKr
+10.Male to Male jumper wires x 2 -- https://bit.ly/3kMWzKr
+
+https://srituhobby.com/how-to-make-an-rfid-door-lock-system-with-raspberry-pi-board/
+https://iotdesignpro.com/projects/iot-based-solenoid-door-lock-using-raspberry-pi-4
