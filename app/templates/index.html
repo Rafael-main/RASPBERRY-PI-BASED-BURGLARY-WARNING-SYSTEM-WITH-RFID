@@ -1,0 +1,26 @@
+{% extends "layouts/layout.html" %}
+{% block title %}Index{% endblock %}
+{% block head %}
+  {{ super() }}
+  <style type="text/css">
+    .important { color: #336699; }
+  </style>
+{% endblock %}
+{% block content %}
+  <h1>Index</h1>
+  <p class="important">
+  <h2><center>IoT Based Solenoid Door Lock Using Raspberry Pi 4<center></h2>                           
+  <form action="/1" method="POST">
+      <p align=center>
+        <button style=width:90px;height:30px;background-color:red;color:white; <button id="on" class="solenoid">ON</button>
+      </p>
+      </br>
+  </form>
+  <form action="/2" method="POST">
+      <p align=center>
+        <button style=width:90px;height:30px;background-color:black;color:white; <button id="off" class="solenoid">OFF</button>
+      </p>
+      </br>
+  </form>  
+    Welcome on my awesome homepage.
+{% endblock %}
