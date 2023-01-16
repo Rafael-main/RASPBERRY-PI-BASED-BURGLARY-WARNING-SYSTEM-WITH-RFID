@@ -1,0 +1,46 @@
+{% extends 'layout.html' %}
+{% block content %}
+<div class="p-5">
+    <div class="display-6 mb-3">
+        Wed, January 11, 2023   9:17 PM
+    </div>
+    <div class="card pb-5 pt-3 shadow-sm mb-3">
+        <div class="card-body fw-bold col display-6">
+          Name
+
+          <div class="display-2 d-flex justify-content-center">
+            Rafael Tibudan
+          </div>
+        </div>
+    </div>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="card shadow-sm m-1 col-5">
+                <div class="card-body fw-bold">
+                    Time
+                    <div class="display-4">
+                        1:00
+                    </div>
+                </div>
+            </div>
+    
+            <div class="card shadow-sm m-1 col">
+                <div class="card-body fw-bold">
+                    Locked Status
+                    <div class="display-4">
+                        True
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid d-flex justify-content-center p-4">
+        <a type="button" href="{{url_for('table')}}"  class="btn-lg btn">View Table</a>
+    </div>
+    
+</div>
+
+
+{% endblock content %}

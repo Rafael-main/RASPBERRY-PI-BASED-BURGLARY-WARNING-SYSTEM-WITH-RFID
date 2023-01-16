@@ -1,0 +1,33 @@
+body {
+    margin: 0 !important;
+    padding: 0 !important;
+    height: 100vh !important;
+    width: 100vw !important;
+    background-color: #fbf9fa !important;
+}
+
+.nav-link:hover {
+    color:#aa1345 !important;
+}
+
+.card {
+    border-radius: 15px !important;
+}
+
+
+.btn {
+    background-color: #2b2024 !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 5px;
+  }
+
+  .btn:hover {
+    background-color: #0f0b0c!important;
+    color: white !important;
+  }
+
+  .table-card {
+    max-height: 66vh !important;
+    border-radius: 10px !important;
+  }
