@@ -1,18 +1,18 @@
-
 from flask import Flask
-# from flask_mysql_connector import MySQL
-# from config import DB_USERNAME, DB_PASSWORD, DB_NAME, DB_HOST, SECRET_KEY
+import sqlite3
+from config import DB_NAME
 
-
+from config import SECRET_KEY
 app = Flask(__name__)
 
-# app.config['SECRET_KEY'] = SECRET_KEY
-# app.config['MYSQL_USER'] = DB_USERNAME
-# app.config['MYSQL_PASSWORD'] = DB_PASSWORD
-# app.config['MYSQL_DATABASE'] = DB_NAME
-# app.config['MYSQL_HOST'] = DB_HOST
 
 
-# mysql = MySQL(app)
+app.config['SECRET_KEY'] = SECRET_KEY
 
-from app import routes
+sqlite = sqlite3.connect(DB_NAME, check_same_thread=False)
+
+
+
+
+
+from rfidapp import routes
