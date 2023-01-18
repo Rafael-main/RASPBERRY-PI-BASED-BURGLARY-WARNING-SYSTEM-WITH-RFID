@@ -1,6 +1,6 @@
-from rfidapp import sqlite
+from app import sqlite
 # import sqlite3
-import rfidapp.secrets as secrets
+import app.secrets as secrets
 
 
 

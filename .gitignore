@@ -1,4 +1,7 @@
 tokens
+instance/
+req_hardware.txt
+app/__pycache__
 # Created by https://www.toptal.com/developers/gitignore/api/flask,python,visualstudiocode
 # Edit at https://www.toptal.com/developers/gitignore?templates=flask,python,visualstudiocode
 
