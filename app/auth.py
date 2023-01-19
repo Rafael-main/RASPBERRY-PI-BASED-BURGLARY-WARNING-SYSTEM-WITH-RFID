@@ -1,11 +1,11 @@
 from flask import Blueprint, redirect, url_for, render_template, flash, session
-from . import db
+from app import db
 
 from app.forms import LoginForm, SignUpForm
+from app.modelsdels import User
 import uuid
 
 auth = Blueprint('auth', __name__)
-
 
 @auth.route('/welcome', methods=['GET', 'POST']) 
 def welcome():
@@ -15,6 +15,9 @@ def welcome():
         userid = f'user-{str(uuid.uuid4())[:5]}'
         # signUpdb = models.record(userid = userid, username = signup_form.username.data, password=signup_form.password.data)
         # signUp_status = signUpdb.signUp()
+        user = User(name = signup_form.username.data, password=signup_form.password.data)
+        db.session.add()
+        db.commit()
         
         if signUp_status == 'success':
             session.permanent = True
