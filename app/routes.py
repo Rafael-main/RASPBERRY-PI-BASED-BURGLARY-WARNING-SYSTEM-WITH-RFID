@@ -1,3 +1,5 @@
+from app.modelsdels import User
+from app import db
 from flask import render_template, redirect, request, session, url_for, flash, jsonify
 from app import app
 
@@ -20,7 +22,10 @@ def welcome():
         userid = f'user-{str(uuid.uuid4())[:5]}'
         # signUpdb = models.record(userid = userid, username = signup_form.username.data, password=signup_form.password.data)
         # signUp_status = signUpdb.signUp()
-        
+
+        user = User(id = userid, name = signup_form.username.data, password = signup_form.password.data)
+        db.session.add(user)
+        db.session.commit()
         # if signUp_status == 'success':
         #     session.permanent = True
         #     loginStatusAndData = signUpdb.login()  # loginStatusAndData mo return na sya sa data sa user na gi login if valid
