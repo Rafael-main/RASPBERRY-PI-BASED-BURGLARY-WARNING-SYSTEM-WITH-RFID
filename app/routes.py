@@ -18,7 +18,8 @@ def welcome():
     signup_form = SignUpForm()
 
     if signup_form.validate_on_submit():
-        
+
+        # create a uuid for a user 
         userid = f'user-{str(uuid.uuid4())[:5]}'
         # signUpdb = models.record(userid = userid, username = signup_form.username.data, password=signup_form.password.data)
         # signUp_status = signUpdb.signUp()
@@ -26,8 +27,24 @@ def welcome():
         user = User(id = userid, name = signup_form.username.data, password = signup_form.password.data)
         db.session.add(user)
         db.session.commit()
+ 
+        # get the first user in the database with a specific name
+        curr_user = User.query.filter_by(name=signup_form.username.data).first()
+
+
+        # check if user is already signed up with app
+        if (curr_user != signup_form.username.data):
+            session.permanent = True
+
+            # login user
+             
+                
+        else: 
+            flash('Username Already Exists!', 'warning')
+        
+        return redirect(url_for('home'))
+        
         # if signUp_status == 'success':
-        #     session.permanent = True
         #     loginStatusAndData = signUpdb.login()  # loginStatusAndData mo return na sya sa data sa user na gi login if valid
 
         #     session['user'] = loginStatusAndData
@@ -60,10 +77,11 @@ def logout():
 
 @app.route('/home')
 def home():
-    if 'user' in session:
-        return render_template('home.html')
-    else:
-        return redirect(url_for('welcome'))
+    # if 'user' in session:
+    #     return render_template('home.html')
+    # else:
+    #     # return redirect(url_for('welcome'))
+    return render_template('home.html')
 
 @app.route('/table')
 def table():

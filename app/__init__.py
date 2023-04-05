@@ -2,12 +2,12 @@ from flask import Flask
 import sqlite3
 from flask_sqlalchemy import SQLAlchemy
 from config import SECRET_KEY, DB_NAME
+# from app.modelsdels import User, AuthorizedUsers, UserLogs
 
 
 db = SQLAlchemy()
 app = Flask(__name__)
 
-# sqlite = sqlite3.connect(DB_NAME, check_same_thread=False)
 app.config['SECRET_KEY'] = SECRET_KEY
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite'
 
