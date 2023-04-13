@@ -8,3 +8,4 @@ DB_NAME = "rfid.db"
 # DB_PASSWORD = "password"
 
 SECRET_KEY = "rfidapp"
+MUMBO_JUMBO = "doobeedoobeedapdap"
