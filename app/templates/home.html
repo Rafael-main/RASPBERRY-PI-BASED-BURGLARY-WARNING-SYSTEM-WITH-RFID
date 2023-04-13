@@ -1,15 +1,18 @@
 {% extends 'layout.html' %}
 {% block content %}
 <div class="p-5">
-    <div class="display-6 mb-3">
-        Fri, March 31, 2023  13:47:16 
+    <div class="display-6 mb-3 fw-bold">
+        {{ userData['datein'] }}
+
     </div>
     <div class="card pb-5 pt-3 shadow-sm mb-3">
         <div class="card-body fw-bold col display-6">
           Name
 
           <div class="display-2 d-flex justify-content-center">
-            Admin
+            {{ userData['username'] }}
+            {{ userData['uuid'] }}
+      
           </div>
         </div>
     </div>
@@ -20,7 +23,8 @@
                 <div class="card-body fw-bold">
                     Time
                     <div class="display-4">
-                        13:47:16
+                        {{ userData['timein'] }}
+             
                     </div>
                 </div>
             </div>
@@ -29,7 +33,7 @@
                 <div class="card-body fw-bold">
                     Permit Status
                     <div class="display-4">
-                        Allow
+                        {{ userData['permitStats'] }}
                     </div>
                 </div>
             </div>

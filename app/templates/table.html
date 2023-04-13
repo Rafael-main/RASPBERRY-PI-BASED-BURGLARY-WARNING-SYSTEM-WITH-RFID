@@ -1,6 +1,31 @@
 {% extends 'layout.html' %}
 {% block content %}
-    
+    <script>
+         $(document).ready(function() {
+            // Function to retrieve data from Flask server
+            function getData() {
+                $.get('/userlogs', function(data) {
+                    // Clear the current table data
+                    $('tbody').empty();
+
+                    // Loop through the data array and append each row to the table
+                    $.each(data, function(index, item) {
+                    var row = '<tr>' +
+                        '<td>' + item.uuid + '</td>' +
+                        '<td>' + item.name + '</td>' +
+                        '<td>' + item.checkInDate + '</td>' +
+                        '<td>' + item.checkInTime + '</td>' +
+                        '<td>' + 'Allowed' + '</td>' +
+                        '</tr>';
+                    $('tbody').append(row);
+                    });
+                });
+            }
+
+            // Call the getData function every 5 seconds
+            setInterval(getData, 5000);
+        });
+    </script>
     <div class="p-5">
         <div class="display-6 mb-3">Log Records</div>
         <div class="card table-card p-3 shadow-sm mb-3">
@@ -8,14 +33,14 @@
                 <table class="table caption-top table-striped">
                     <thead>
                         <tr>
-                        <th scope="col">First Name</th>
-                        <th scope="col">Last Name</th>
+                        <th scope="col">ID</th>
+                        <th scope="col">Name</th>
                         <th scope="col">Date Accessed</th>
                         <th scope="col">Time Accessed</th>
                         <th scope="col">Permit Status</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody id="userlog-table">
                         <tr>
                             <td>John</td>
                             <td>Doe</td>

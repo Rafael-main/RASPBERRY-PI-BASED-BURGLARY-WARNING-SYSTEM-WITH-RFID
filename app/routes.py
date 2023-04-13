@@ -1,3 +1,4 @@
+from app.controller import Logs, UserController
 from app.modelsdels import User
 from app import db
 from flask import render_template, redirect, request, session, url_for, flash, jsonify
@@ -6,6 +7,7 @@ from app import app
 from app.forms import LoginForm, SignUpForm
 import app.models as models
 import uuid
+from datetime import datetime
 
 
 @app.route('/')
@@ -21,50 +23,47 @@ def welcome():
 
         # create a uuid for a user 
         userid = f'user-{str(uuid.uuid4())[:5]}'
-        # signUpdb = models.record(userid = userid, username = signup_form.username.data, password=signup_form.password.data)
-        # signUp_status = signUpdb.signUp()
 
-        user = User(id = userid, name = signup_form.username.data, password = signup_form.password.data)
-        db.session.add(user)
-        db.session.commit()
+        # initialize user that attempts to log in
+        userController = UserController(uuid = userid, username = signup_form.username.data, password = signup_form.password.data)
  
-        # get the first user in the database with a specific name
-        curr_user = User.query.filter_by(name=signup_form.username.data).first()
-
-
+        isUserRegistered = userController.addUser()
         # check if user is already signed up with app
-        if (curr_user != signup_form.username.data):
+        if (isUserRegistered == 'success'):
             session.permanent = True
-
             # login user
-             
-                
+            curr_user = userController.loginUser()
+            if curr_user != 'wrong_pass' or curr_user != 'non-exist':
+                session['user'] = curr_user
+                # return redirect(url_for('welcome'))
+                return render_template('welcome.html', loginForm = login_form, signupForm = signup_form)
+                  
         else: 
             flash('Username Already Exists!', 'warning')
         
         return redirect(url_for('home'))
         
-        # if signUp_status == 'success':
-        #     loginStatusAndData = signUpdb.login()  # loginStatusAndData mo return na sya sa data sa user na gi login if valid
-
-        #     session['user'] = loginStatusAndData
-        #     return redirect(url_for('home'))
-           
-        # else:
-        #     flash('Username Already Exist!', 'warning')
-        # return redirect(url_for('home'))
 
     elif login_form.validate_on_submit():
         session.permanent = True
-        # logindb = models.record(username = login_form.login_username.data, password=login_form.login_password.data)
+        logUserIn = UserController(username = login_form.login_username.data, password=login_form.login_password.data)
+        attemptCurrUser = logUserIn.loginUser()
+        print(attemptCurrUser)
+        if attemptCurrUser == 'wrong_pass' or attemptCurrUser == 'non-exist':
+            flash('Wrong Username or Password! Try Again.', 'danger')
 
-        # loginStatusAndData= logindb.login() # loginStatusAndData mo return na sya sa data sa user na gi login if valid
+        else:
+            now = datetime.now()
+            jsonifiedUser = {
+                'uuid': str(attemptCurrUser.uuid),
+                'username': attemptCurrUser.name,
+                'timein': now.strftime("%H:%M:%S"),
+                'datein': now.strftime("%d/%m/%Y"),
+                'permitStats': 'Allow'
+            }
+            session['user'] = jsonifiedUser
+            return render_template('home.html', userData = session['user'])
 
-        # if loginStatusAndData == 'wrong_pass' or loginStatusAndData == 'non_exist':
-        #     flash('Wrong Username or Password!', 'danger')
-        # else:
-        #     session['user'] = loginStatusAndData
-        #     return redirect(url_for('home'))
     
     return render_template('welcome.html', loginForm = login_form, signupForm = signup_form)
 
@@ -77,12 +76,21 @@ def logout():
 
 @app.route('/home')
 def home():
-    # if 'user' in session:
-    #     return render_template('home.html')
-    # else:
-    #     # return redirect(url_for('welcome'))
-    return render_template('home.html')
+    if 'user' in session:
+        return render_template('home.html', userData = session['user'])
+    else:
+        return redirect(url_for('welcome'))
 
 @app.route('/table')
 def table():
     return render_template('table.html')
+
+@app.route('/userlogs')
+def userlogs():
+    if 'user' in session:
+        logsOfUsers = Logs()
+
+        return jsonify(logsOfUsers.logs())
+
+    flash('Wrong Username or Password! Try Again.', 'danger')
+    return render_template('welcome.html')
