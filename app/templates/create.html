@@ -1,0 +1,44 @@
+{% extends 'layout.html' %}
+{% block content %}
+
+<div class="container pt-5">
+    <div class="d-flex justify-content-center">
+        <form id="newUserLog" action="" method="post">
+            <div class="mb-3">
+                <div class="alert alert-primary" role="alert">
+                    Scan the RFID Card.
+                </div>
+                <label for="tagInput" class="form-label">RFID Tag Number</label>
+                <div class="input-group mb-3">
+                    <input name="userlogtag" type="text" class="form-control" id="tagInput" aria-describedby="userlogtag" readonly>
+                    <span class="input-group-text" style="background-color: #2b2024 ;">
+                        <button id="scanButton" class="btn btn-primary">Scan</button>
+                    </span>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label for="userlogname" class="form-label">Name</label>
+                <input name="userlogname" type="text" class="form-control" id="userlogname">
+            </div>
+            
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function() {
+        // Handle RFID tag scan button click
+        $('#scanButton').click(function() {
+            $.get('/read_tag', function(response) {
+                $('#tagInput').val(response);
+            });
+        });
+
+        $('#newUserLog').submit(function() {
+            
+        })
+    });
+</script>
+
+{% endblock content %}

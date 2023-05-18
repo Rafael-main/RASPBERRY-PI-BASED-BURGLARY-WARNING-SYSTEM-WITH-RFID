@@ -2,13 +2,10 @@
 {% block content %}
     <script>
          $(document).ready(function() {
-            // Function to retrieve data from Flask server
             function getData() {
                 $.get('/userlogs', function(data) {
-                    // Clear the current table data
                     $('tbody').empty();
 
-                    // Loop through the data array and append each row to the table
                     $.each(data, function(index, item) {
                     var row = '<tr>' +
                         '<td>' + item.uuid + '</td>' +
@@ -22,8 +19,7 @@
                 });
             }
 
-            // Call the getData function every 5 seconds
-            setInterval(getData, 5000);
+            setInterval(getData, 1000);
         });
     </script>
     <div class="p-5">

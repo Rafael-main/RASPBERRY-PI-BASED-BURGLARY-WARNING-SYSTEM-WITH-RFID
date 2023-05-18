@@ -15,7 +15,6 @@
         <div class="container-fluid text-light">
             <div class="navbar-nav">
                 <a class="nav-link text-light   " aria-current="page" href="{{url_for('home')}}">RPiBWS</a>
-                <a class="nav-link text-light" href="{{url_for('table')}}">Logs</a>
             </div>
           <button class="navbar-toggler " type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon text-light"></span>
@@ -23,6 +22,8 @@
           <div class="collapse navbar-collapse show" id="navbarNavAltMarkup">
             <div class="navbar-nav ms-auto">
               
+              <a class="nav-link text-light" href="{{url_for('table')}}">Logs</a>
+              <a class="nav-link text-light" href="/create">Create New User</a>
               <a class="nav-link text-light" href="/logout">Logout</a>
             </div>
           </div>
