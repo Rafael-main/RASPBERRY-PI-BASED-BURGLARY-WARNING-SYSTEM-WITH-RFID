@@ -1,0 +1,49 @@
+{% extends 'layout.html' %}
+{% block content %}
+    <script>
+         $(document).ready(function() {
+            function getMotionData() {
+                $.get('/motionlogs', function(data) {
+                    // $('tbody #motionlog-table').empty();
+                    $('tbody').empty();
+
+                    var motion_data = data['data']
+                    $.each(data, function(index, item) {
+                    var row = '<tr>' +
+                        '<td>' + item.message + '</td>' +
+                        '<td>' + item.checkInDate + '</td>' +
+                        '<td>' + item.checkInTime + '</td>' +
+                        '</tr>';
+                    $('tbody').append(row);
+                    });
+                });
+            }
+
+            setInterval(getMotionData, 1000);
+        });
+    </script>
+    <div class="p-5">
+        <div class="display-6 mb-3">Log Records</div>
+        <div class="card table-card p-3 shadow-sm mb-3">
+            <div class="container p-2 table-responsive">
+                <table class="table caption-top table-striped">
+                    <thead>
+                        <tr>
+                        <th scope="col">Status</th>
+                        <th scope="col">Date Accessed</th>
+                        <th scope="col">Time Accessed</th>
+                        </tr>
+                    </thead>
+                    <tbody id="motionlog-table">
+                        <tr>
+                            <td>Intruder</td>
+                            <td>March 27, 2023</td>
+                            <td>10:09:20</td>
+                        </tr>      
+                    </tbody>
+                </table>
+            </div>
+           
+        </div>
+    </div>
+{% endblock content %}

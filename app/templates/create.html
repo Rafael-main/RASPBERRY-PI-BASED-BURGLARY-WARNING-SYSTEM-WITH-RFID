@@ -28,15 +28,51 @@
 
 <script>
     $(document).ready(function() {
-        // Handle RFID tag scan button click
+        // // Handle RFID tag scan button click
+        // function getScannedRFID() {
+        //     $.get('/get_scanned_rfid', function(data) {
+        //         $('tbody #motionlog-table').empty();
+
+        //         var motion_data = data['data']
+        //         $.each(data, function(index, item) {
+        //         var row = '<tr>' +
+        //             '<td>' + item.message + '</td>' +
+        //             '<td>' + item.checkInDate + '</td>' +
+        //             '<td>' + item.checkInTime + '</td>' +
+        //             '</tr>';
+        //         $('tbody').append(row);
+        //         });
+        //     });
+        // }
+
+        // setInterval(getScannedRFID, 1000);
+
         $('#scanButton').click(function() {
             $.get('/read_tag', function(response) {
                 $('#tagInput').val(response);
             });
         });
 
-        $('#newUserLog').submit(function() {
-            
+        $('#newUserLog').submit(function(event) {
+            event.preventDefault()
+
+            var formData = $(this).serialize()
+
+            $.ajax({
+                url: '/addrecorduserlogs', // Replace with the Flask endpoint URL
+                method: 'POST',
+                data: formData, // Convert form data array to JSON string
+                success: function(response) {
+                $('#newUserLog')[0].reset();
+                showSuccessAlert('Added Record');
+                
+                if (response['status'] === 'ok') {
+                }
+                },
+                error: function(xhr, status, error) {
+                console.error(error);
+                }
+            })
         })
     });
 </script>

@@ -12,8 +12,22 @@ class UserLogs(db.Model):
     uuid = db.Column(db.String(1000))
     rfidTagNum = db.Column(db.String(100))
     name = db.Column(db.String(1000))
-    checkInTime = db.Column(db.DateTime(), default=datetime.now())
-    checkInDate = db.Column(db.Date(), default=datetime.today())
+    checkInTime = db.Column(db.String(1000))
+    checkInDate = db.Column(db.String(1000))
+
+class TagUser(db.Model):
+    id = db.Column(db.Integer, primary_key=True) # primary keys are required by SQLAlchemy
+    uuid = db.Column(db.String(1000))
+    rfidTagNum = db.Column(db.String(1000))
+    name = db.Column(db.String(1000))
+    data = db.Column(db.String(1000))
+
+class MotionLogs(db.Model):
+    id = db.Column(db.Integer, primary_key=True) # primary keys are required by SQLAlchemy
+    uuid = db.Column(db.String(1000))
+    message = db.Column(db.String(1000))
+    checkInTime = db.Column(db.String(1000))
+    checkInDate = db.Column(db.String())
 
 
 

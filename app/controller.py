@@ -1,5 +1,5 @@
 from flask import jsonify
-from app.models import User, UserLogs
+from app.models import TagUser, User, UserLogs, MotionLogs
 from app import db
 import app.secrets as secrets
 class UserController:
@@ -13,7 +13,6 @@ class UserController:
         try:
             hashed_pass = self.userPasswordProcess.to_hash(self.userPassword)
             user = User(uuid = self.userUuid, name = self.userUserName, password = hashed_pass)
-            # find if curr_user (the user trying to sign in) is already signed up
             curr_user = User.query.filter_by(name=self.userUserName).all()
             if len(curr_user) <= 0:
                 db.session.add(user)
@@ -37,81 +36,129 @@ class UserController:
             
 
 class UserLogsController:
+    def __init__(self, uuid='', rfidTagNum='', name='', checkInTime=None, checkInDate=None):
+        self.uuid = uuid
+        self.rfidTagNum = rfidTagNum
+        self.name = name
+        self.checkInTime = checkInTime
+        self.checkInDate = checkInDate
+    
+    def add_logs(self):
+        try:
+            log = UserLogs(uuid=self.uuid, rfidTagNum = self.rfidTagNum, name = self.name, checkInTime = self.checkInTime, checkInDate = self.checkInDate)
+            db.session.add(log)
+            db.session.commit()
+            return {'status':'ok', 'message': 'log added'}
+        except:
+            return {'status': 'failed', 'message': 'request failed'}
     def logs(self):
-        tojsonifyAllLogs = []
-        allOfTheLogs = UserLogs.query.all()
-        print(allOfTheLogs)
-        for log in allOfTheLogs:
-            print(log.uuid)
-            print(log.name)
-            tojsonifyAllLogs.append({
-                'uuid' : log.uuid,
-                'name' : log.name,
-                'checkInTime' : str(log.checkInTime),
-                'checkInDate' : str(log.checkInDate),
-            })
-        return tojsonifyAllLogs
+        try:
+            tojsonifyAllLogs = []
+            allOfTheLogs = UserLogs.query.all()
+            print(allOfTheLogs)
+            for log in allOfTheLogs:
+                print(log.uuid)
+                print(log.name)
+                tojsonifyAllLogs.append({
+                    'uuid' : log.uuid,
+                    'name' : log.name,
+                    'checkInTime' : str(log.checkInTime),
+                    'checkInDate' : str(log.checkInDate),
+                })
+            return {'status':'success', 'message':'request provided', 'data':tojsonifyAllLogs}
+        except:
+            return {'status':'failed', 'message':'request failed'}
 
-# class FirmwareController:
-#     def open_lock():
-#         # Configure the GPIO pin for the solenoid lock
-#         lock_pin = 18
-#         GPIO.setmode(GPIO.BCM)
-#         GPIO.setup(lock_pin, GPIO.OUT)
-
-#         # Activate the solenoid lock
-#         GPIO.output(lock_pin, GPIO.HIGH)
-#         time.sleep(5)  # Adjust the delay as needed
-
-#         # Deactivate the solenoid lock
-#         GPIO.output(lock_pin, GPIO.LOW)
-#         GPIO.cleanup()
+class MotionLogsController:
+    def __init__(self, message='', checkInTime=None, checkInDate=None):
+        self.message = message
+        self.checkInTime = checkInTime
+        self.checkInDate = checkInDate
     
-# # Function to control the buzzer
-# def buzz_buzzer(num_times, interval):
-#     # Configure the GPIO pin for the buzzer
-#     buzzer_pin = 23
-#     GPIO.setmode(GPIO.BCM)
-#     GPIO.setup(buzzer_pin, GPIO.OUT)
-
-#     # Buzz the buzzer the specified number of times with the given interval
-#     for _ in range(num_times):
-#         GPIO.output(buzzer_pin, GPIO.HIGH)
-#         time.sleep(interval)
-#         GPIO.output(buzzer_pin, GPIO.LOW)
-#         time.sleep(interval)
-
-#     GPIO.cleanup()
-
-# # Function to read RFID data and send it to the Flask server
-# def read_rfid():
-#     while True:
-#         try:
-#             # Read the RFID tag
-#             tag_id, tag_data = reader.read()
-
-#             # Validate the RFID tag and control the solenoid lock
-#             if tag_id in rfid_tags:
-#                 # Open the solenoid lock
-#                 open_lock()
-#                 # Activate the buzzer twice with an interval of 2 seconds
-#                 buzz_buzzer(2, 2)
-#             else:
-#                 # Activate the buzzer three times with a one-second interval
-#                 buzz_buzzer(3, 1)
-
-#             # Send RFID data to the Flask server
-#             payload = {'tag_id': tag_id, 'tag_data': tag_data}
-#             requests.post('http://localhost:5000/rfid', data=payload)
-
-#         except KeyboardInterrupt:
-#             GPIO.cleanup()
-#             break
+    def add_motion_log(self):
+        try:
+            motionLog = MotionLogs(message = self.message, checkInTime = self.checkInTime, checkInDate = self.checkInDate)
+            db.session.add(motionLog)
+            db.session.commit()
+            return {'status':'ok', 'message':'motion detected!'}
+        except:
+            return {'status':'failed', 'message':'request failed'}
     
-#     # Function to validate the RFID tag
-#     def validate_rfid(rfid_data):
-#         # Implement your own validation logic here
-#         # You can check against a database of valid RFID tags or use any other method
-#         # For demonstration purposes, we assume a static valid RFID tag value
-#         valid_rfid = '1234567890'
-#         return rfid_data == valid_rfid
+    def read_all_motion_logs(self):
+        try:
+
+            tojsonifyAllLogs = []
+            allOfTheLogs = MotionLogs.query.all()
+            print(allOfTheLogs)
+            for log in allOfTheLogs:
+                print(log.uuid)
+                print(log.name)
+                tojsonifyAllLogs.append({
+                    'message' : log.name,
+                    'checkInTime' : str(log.checkInTime),
+                    'checkInDate' : str(log.checkInDate),
+                })
+            return {'status':'success', 'message':'request provided', 'data':tojsonifyAllLogs}
+        except:
+
+            return {'status':'failed', 'message':'request failed'}
+
+
+class TagUserController:
+    def __init__(self, uuid='', rfidTagNum='', name='', data=''):
+        self.uuid=uuid
+        self.rfidTagNum=rfidTagNum
+        self.name=name
+        self.data=data
+
+    def add_tag_user(self):
+        try:
+
+            all_tag_user = TagUser().query.all()
+            for one_tag_user in all_tag_user:
+                if one_tag_user.rfidTagNum == self.rfidTagNum:
+                    return {'status': 'failed', 'message':'user already in database'}
+            tag_user = TagUser(uuid=self.uuid, rfidTagNum=self.rfidTagNum, name=self.name, data=self.data)
+            db.session.add(tag_user)
+            db.session.commit()
+            return {'status':'ok', 'message':'successfully added user'}
+        except:
+            return {'status':'failed', 'message':'request failed'}
+        
+    def update_tag_user(self, id):
+        try:
+            updateTag = TagUser.query.filter_by(id=id).first()
+            updateTag.rfidTagNum=self.rfidTagNum
+            updateTag.name=self.name
+            updateTag.data=self.data
+
+            db.session.commit()
+            return {'status':'ok', 'message':'successfully updated user'}
+        except:
+            return {'status':'failed', 'message':'request failed'}
+        
+    def del_tag_user(self, id):
+        try:
+           TagUser.query.filter_by(id=id).delete() 
+           db.session.commit()
+           return {'status':'ok', 'message':'successfully deleted user'}
+        except:
+            return {'status':'failed', 'message':'request failed'}
+        
+    def read_tag_user(self):
+        try:
+            all_tag_user = TagUser.query.all()
+            tag_user_list = []
+
+            for one_tag_user in all_tag_user:
+                tag_user_list.append({
+                    'id': one_tag_user.id,
+                    'uuid': one_tag_user.uuid,
+                    'rfidTagNum': one_tag_user.rfidTagNum,
+                    'data': one_tag_user.data
+                })
+
+            return {'status':'success', 'message':'request provided', 'data':tag_user_list}
+        except:
+            return {'status':'failed', 'message':'request failed'}
+        

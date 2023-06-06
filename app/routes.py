@@ -1,4 +1,4 @@
-from app.controller import UserController, UserLogs
+from app.controller import MotionLogsController, TagUserController, UserController, UserLogs, UserLogsController
 from flask import render_template, redirect, request, session, url_for, flash, jsonify
 from app import app
 
@@ -6,8 +6,11 @@ from app.forms import LoginForm, SignUpForm
 import uuid
 from datetime import datetime
 
-rfid_tags = {}
+from app.models import TagUser
 
+rfid_tags = {}
+scanned_rfid = ''
+curr_href = ''
 
 @app.route('/')
 def land():
@@ -87,66 +90,172 @@ def table():
 @app.route('/create')
 def create():
     if 'user' in session:
+        print(request.url)
         return render_template('create.html')
+    else:
+        return redirect(url_for('welcome'))
+
+@app.route('/tablemotion')
+def tablemotion():
+    if 'user' in session:
+        return render_template('table_motion.html')
     else:
         return redirect(url_for('welcome'))
 
 @app.route('/userlogs')
 def userlogs():
-    if 'user' in session:
-        logsOfUsers = UserLogs()
+    try:
+        if 'user' in session:
 
-        return jsonify(logsOfUsers.logs())
+            logsOfUsers = UserLogs()
 
-    flash('Wrong Username or Password! Try Again.', 'danger')
-    return render_template('welcome.html')
+            return jsonify(logsOfUsers.logs())
 
-# read tag
-# @app.route('/read_tag')
-# def read_tag():
-#     try:
-#         tag_id, tag_data = reader.read()
-#         return tag_data
-#     except Exception as e:
-#         return str(e)
+        flash('Wrong Username or Password! Try Again.', 'danger')
+        return render_template('welcome.html')
+    except:
+        return jsonify({'message':'request pending...'})
 
-# Create a new RFID tag
+@app.route('/add_logs', methods=['POST'])
+def add_logs():
+    try:
+        if request.method == 'POST':
+            res_post = request.get_json()
+            log_uuid = f'log-{str(uuid.uuid4())[:5]}'
+            rfid_tag_num = res_post['tag_id']
+            rfid_tag_data = res_post['tag_data']
+            tag = TagUser.query.filter_by(tag_id=rfid_tag_num).first()
+            if tag:
+                return jsonify({'status':'ok', 'message':'Already exists!'})
+
+            user_log_controller = UserLogsController(uuid=log_uuid, rfidTagNum=rfid_tag_num, name=rfid_tag_data)
+            user_log_controller_response = user_log_controller.add_logs()
+
+        return jsonify(user_log_controller_response)
+    except:
+        return jsonify({'status': 'failed'})
+
+@app.route('/motionlogs', methods=['GET'])
+def motionlogs():
+    try:
+        motion_log_controller = MotionLogsController()
+        motion_log_controller_response = motion_log_controller.read_all_motion_logs()
+
+        return jsonify(motion_log_controller_response)
+    except:
+        return jsonify({'status': 'failed'})
+
+@app.route('/motion', methods=['POST'])
+def motion():
+    try:
+        if request.method == 'POST':
+            res_post = request.get_json()
+            message = res_post['message']
+            motion_log_controller = MotionLogsController(message=message)
+            motion_log_controller_response = motion_log_controller.add_motion_log()
+
+        return jsonify(motion_log_controller_response)
+    except:
+        return jsonify({'status': 'failed'})
+
+@app.route('/curr_route', methods=['GET','POST'])
+def curr_route():
+    data = ''
+    if request.method == 'POST':
+        res = request.get_json()
+        data = res['data']
+        curr_href = res['data']
+        print(curr_href)
+        print(data)
+
+    return jsonify({'status': 'ok', 'data':data})
+
+@app.route('/rfidtag')
+def rfidtag():
+    status_data = request.form.get('status')
+    tag_id = request.form.get('tag_id')
+    tag_data = request.form.get('tag_data')
+    data = {
+        'status': status_data,
+        'tag_id': tag_id,
+        'tag_data': tag_data
+    }
+    return jsonify({'status': 'ok', 'data': data})
+
+@app.route('/read_tag', methods=['GET', 'POST'])
+def read_tag():
+    try:
+        if request.method == 'POST':
+            tag_id = request.form['tag_id']
+            # Check if the tag exists in the database
+            tag = TagUser.query.filter_by(tag_id=tag_id).first()
+            if tag:
+                if request.headers.get('User-agent'):
+                    return jsonify({'status':'ok', 'message':'RFID tag exists in the database'})
+
+            scanned_rfid = tag_id
+            return jsonify({'status': 'ok', 'message':'RFID tag scanned', 'data': scanned_rfid})
+        elif request.method == 'GET':
+            return jsonify({'status': 'ok', 'data': scanned_rfid})
+            
+    except:
+        return jsonify({'status':'failed', 'message':'Something went wrong...'})
+
+
+
+# Route to check if RFID tag exists in the database
+@app.route('/check_tag', methods=['POST'])
+def check_tag():
+    try:
+        tag_id = request.form['tag_id']
+
+        # Check if the tag exists in the database
+        tag = TagUser.query.filter_by(tag_id=tag_id).first()
+        if tag:
+            return jsonify({'status':'ok', 'message':f'RFID tag exists in the database with data: {tag.tag_data}'})
+
+        return jsonify({'status': 'does not exist', 'message':'RFID tag does not exist in the database'})
+    except:
+        return jsonify({'status':'failed', 'message':'Something went wrong...'})
+
+
 @app.route('/rfid', methods=['POST'])
 def create_rfid_tag():
+    tag_uuid = f'tag-{str(uuid.uuid4())[:5]}'
     tag_id = request.form.get('userlogtag')
     tag_data = request.form.get('userlogname')
     name = request.form.get('userlogname')
 
-    
-    if tag_id in rfid_tags:
-        return 'Tag ID already exists', 400
 
-    rfid_tags[tag_id] = tag_data
-    return 'RFID tag created successfully', 201
+    tag_user_controller = TagUserController(uuid=tag_uuid, rfidTagNum=tag_id, name=name, data=tag_data)
+
+    tag_controller_response = tag_user_controller.add_tag_user()
+
+    return jsonify(tag_controller_response)
 
 # Read an existing RFID tag
-@app.route('/rfid/<tag_id>', methods=['GET'])
-def read_rfid_tag(tag_id):
-    if tag_id not in rfid_tags:
-        return 'Tag ID does not exist', 404
+@app.route('/rfid/', methods=['GET'])
+def read_rfid_tag():
+    tag_user_controller = TagUserController()
 
-    return jsonify({'tag_id': tag_id, 'tag_data': rfid_tags[tag_id]})
+    tag_controller_response = tag_user_controller.read_tag_user()
+
+    return jsonify(tag_controller_response)
 
 # Update an existing RFID tag
 @app.route('/rfid/<tag_id>', methods=['PUT'])
 def update_rfid_tag(tag_id):
-    if tag_id not in rfid_tags:
-        return 'Tag ID does not exist', 404
-
-    tag_data = request.form.get('tag_data')
-    rfid_tags[tag_id] = tag_data
-    return 'RFID tag updated successfully'
+    update_record_json = request.get_json()
+    rfid_tag_num = update_record_json['rfidtagnum']
+    rfid_tag_name = update_record_json['tagname']
+    rfid_tag_data = update_record_json['tagdata']
+    tag_user_controller = TagUserController(rfidTagNum=rfid_tag_num, name=rfid_tag_name, data=rfid_tag_data)
+    update_tag_user = tag_user_controller.update_tag_user(tag_id)
+    return jsonify(update_tag_user)
 
 # Delete an existing RFID tag
 @app.route('/rfid/<tag_id>', methods=['DELETE'])
 def delete_rfid_tag(tag_id):
-    if tag_id not in rfid_tags:
-        return 'Tag ID does not exist', 404
-
-    del rfid_tags[tag_id]
-    return 'RFID tag deleted successfully'
+    tag_user_controller = TagUserController()
+    tag_response_controller = tag_user_controller.del_tag_user(tag_id)
+    return jsonify(tag_response_controller)
